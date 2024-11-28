@@ -49,7 +49,7 @@ def shorten():
         cursor.execute('''
             INSERT INTO goshort.pro.url (base_url, short_url, user_id)
             VALUES (%s, %s, %s);
-        ''', (original_url, short_id, user_id))
+        ''', (original_url, f"{BASE_URL}{short_id}", user_id))
         connection.commit()
 
         return jsonify({"url_short": f"{BASE_URL}{short_id}"}), 201
