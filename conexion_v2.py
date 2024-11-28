@@ -28,10 +28,12 @@ def shorten():
     if not original_url or not user_id:
         return jsonify({"message": "Faltan datos obligatorios (original_url, user_id)"}), 400
 
-    connection = get_db_connection()
-    cursor = connection.cursor()
-
+    connection = None
+    cursor = None
     try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
+
         # Verificar si ya existe una URL acortada para este usuario
         cursor.execute('''
             SELECT url_id FROM goshort.pro.URL WHERE base_url = %s AND user_id = %s;
@@ -42,9 +44,8 @@ def shorten():
             return jsonify({"url_short": f"{BASE_URL}{existing_url[0]}"}), 200
 
         # Generar un nuevo identificador único
-        short_id = BASE_URL + str(generate_short_link())
+        short_id = generate_short_link()  # Solo el ID, no la URL completa
         # Insertar la nueva URL en la base de datos
-        creation_date = datetime.utcnow()
         cursor.execute('''
             INSERT INTO goshort.pro.URL (base_url, short_url, user_id)
             VALUES (%s, %s, %s);
@@ -54,13 +55,14 @@ def shorten():
         return jsonify({"url_short": f"{BASE_URL}{short_id}"}), 201
 
     except Exception as e:
-        print(f"Error al acortar la URL: {e}")
-        connection.rollback()
+        print(f"Error al acortar la URL: {e}")  # Asegúrate de que los errores se registren
         return jsonify({"message": "Error del servidor"}), 500
 
     finally:
-        cursor.close()
-        connection.close()
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
 
 # Ejecuta la aplicación
 if __name__ == "__main__":
