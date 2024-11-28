@@ -36,7 +36,7 @@ def shorten():
 
         # Verificar si ya existe una URL acortada para este usuario
         cursor.execute('''
-            SELECT url_id FROM goshort.pro.URL WHERE base_url = %s AND user_id = %s;
+            SELECT url_id FROM goshort.pro.url WHERE base_url = %s AND user_id = %s;
         ''', (original_url, user_id))
         existing_url = cursor.fetchone()
 
@@ -47,7 +47,7 @@ def shorten():
         short_id = generate_short_link()  # Solo el ID, no la URL completa
         # Insertar la nueva URL en la base de datos
         cursor.execute('''
-            INSERT INTO goshort.pro.URL (base_url, short_url, user_id)
+            INSERT INTO goshort.pro.url (base_url, short_url, user_id)
             VALUES (%s, %s, %s);
         ''', (original_url, short_id, user_id))
         connection.commit()
@@ -65,9 +65,9 @@ def shorten():
             connection.close()
 
 # Ejecuta la aplicación
-if __name__ == "__main__":
-    app.run(debug=True)
-
 #if __name__ == "__main__":
-#    port = int(os.environ.get("PORT", 5000))
-#    app.run(host="0.0.0.0", port=port, debug=True)
+#    app.run(debug=True)
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)
+
